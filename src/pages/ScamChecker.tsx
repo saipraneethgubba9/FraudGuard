@@ -90,7 +90,7 @@ export const ScamChecker: React.FC = () => {
         <button
           onClick={analyzeMessage}
           disabled={loading || !text.trim()}
-          className="w-full py-4 bg-brand-500 text-black rounded-full font-bold hover:bg-brand-400 transition-all flex items-center justify-center gap-2 disabled:opacity-50 text-sm tracking-wide shadow-lg shadow-brand-500/20"
+          className="w-full py-4 bg-brand-500 text-black rounded-full font-bold hover:bg-brand-400 transition-all flex items-center justify-center gap-2 disabled:cursor-not-allowed text-sm tracking-wide shadow-lg shadow-brand-500/20"
         >
           {loading ? (
             <><Loader2 className="w-5 h-5 animate-spin" />{getTranslation(lang, "checker.analyzing")}</>

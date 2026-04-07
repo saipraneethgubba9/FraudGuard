@@ -38,7 +38,9 @@ export const Login: React.FC = () => {
     setGoogleLoading(true);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
     });
     if (error) { setError(error.message); setGoogleLoading(false); }
   };
@@ -59,7 +61,7 @@ export const Login: React.FC = () => {
         <button
           onClick={handleGoogleLogin}
           disabled={googleLoading}
-          className="w-full flex items-center justify-center gap-3 py-3.5 px-4 bg-[#282828] border border-[#3e3e3e] rounded-xl font-semibold text-white hover:bg-[#3e3e3e] transition-all mb-6 disabled:opacity-50 text-sm"
+          className="w-full flex items-center justify-center gap-3 py-3.5 px-4 bg-[#282828] border border-[#3e3e3e] rounded-xl font-semibold text-white hover:bg-[#3e3e3e] transition-all mb-6 disabled:cursor-not-allowed text-sm"
         >
           <GoogleIcon />
           {googleLoading ? "Redirecting..." : "Continue with Google"}

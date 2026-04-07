@@ -62,7 +62,7 @@ export const Register: React.FC = () => {
         <button
           onClick={handleGoogleSignUp}
           disabled={googleLoading}
-          className="w-full flex items-center justify-center gap-3 py-3.5 px-4 bg-[#282828] border border-[#3e3e3e] rounded-xl font-semibold text-white hover:bg-[#3e3e3e] transition-all mb-6 disabled:opacity-50 text-sm"
+          className="w-full flex items-center justify-center gap-3 py-3.5 px-4 bg-[#282828] border border-[#3e3e3e] rounded-xl font-semibold text-white hover:bg-[#3e3e3e] transition-all mb-6 disabled:cursor-not-allowed text-sm"
         >
           <GoogleIcon />
           {googleLoading ? "Redirecting..." : "Sign up with Google"}

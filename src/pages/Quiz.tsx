@@ -146,7 +146,7 @@ export const Quiz: React.FC = () => {
                 } else if (isSelected && !isCorrect) {
                   buttonClass = cn(buttonClass, "border-brand-500 bg-brand-50 dark:bg-brand-900/20 text-brand-900 dark:text-brand-400 font-semibold");
                 } else {
-                  buttonClass = cn(buttonClass, "border-gray-50 dark:border-zinc-800 opacity-50 grayscale-[0.5]");
+                  buttonClass = cn(buttonClass, "border-gray-50 dark:border-zinc-800 text-gray-400 dark:text-gray-600");
                 }
               }
 
@@ -189,7 +189,7 @@ export const Quiz: React.FC = () => {
                     <h4 className="font-bold text-lg mb-1">
                       {isCorrect ? getTranslation(lang, "quiz.correct") : getTranslation(lang, "quiz.incorrect")}
                     </h4>
-                    <p className="opacity-90">
+                    <p className="leading-relaxed">
                       {isCorrect 
                         ? getTranslation(lang, "quiz.feedback_correct") 
                         : getTranslation(lang, "quiz.feedback_incorrect", { answer: currentScenario.correct_answer })}

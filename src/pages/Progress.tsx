@@ -170,7 +170,7 @@ export const Progress: React.FC = () => {
               className={`p-6 rounded-2xl border-2 flex flex-col items-center text-center transition-all ${
                 achievement.unlocked 
                   ? "border-brand-100 dark:border-brand-900/30 bg-brand-50/30 dark:bg-brand-900/10" 
-                  : "border-gray-50 dark:border-zinc-800 opacity-40 grayscale"
+                  : "border-gray-50 dark:border-zinc-800"
               }`}
             >
               <span className="text-4xl mb-3">{achievement.icon}</span>

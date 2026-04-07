@@ -86,7 +86,7 @@ export const Settings: React.FC = () => {
             <button
               type="submit"
               disabled={updating}
-              className="px-8 py-3 bg-brand-500 text-black rounded-full font-bold hover:bg-brand-400 transition-all disabled:opacity-50 text-sm"
+              className="px-8 py-3 bg-brand-500 text-black rounded-full font-bold hover:bg-brand-400 transition-all disabled:cursor-not-allowed text-sm"
             >
               {updating ? "..." : getTranslation(lang, "settings.profile_update")}
             </button>

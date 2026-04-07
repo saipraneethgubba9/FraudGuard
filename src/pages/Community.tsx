@@ -175,7 +175,7 @@ export const Community: React.FC = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-5 bg-brand-600 text-white rounded-2xl font-bold shadow-lg shadow-brand-200 hover:bg-brand-700 transition-all disabled:opacity-50"
+                  className="w-full py-5 bg-brand-600 text-white rounded-2xl font-bold shadow-lg shadow-brand-200 hover:bg-brand-700 transition-all disabled:cursor-not-allowed"
                 >
                   {loading ? getTranslation(lang, "community.posting") : getTranslation(lang, "community.submit")}
                 </button>
