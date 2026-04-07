@@ -4,7 +4,7 @@ import { motion } from "motion/react";
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-black flex transition-colors duration-300">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#121212] flex transition-colors duration-300">
       <Sidebar />
       <main className="flex-1 ml-64 p-8">
         <motion.div

@@ -1,18 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --color-brand-50: #f5eefc;
-  --color-brand-100: #eadcf9;
-  --color-brand-200: #d5b9f3;
-  --color-brand-300: #c196ed;
-  --color-brand-400: #ac73e7;
-  --color-brand-500: #9e14df;
-  --color-brand-600: #8e12c9;
-  --color-brand-700: #7e10b2;
-  --color-brand-800: #6e0e9c;
-  --color-brand-900: #5e0c85;
-  --color-brand-950: #4e0a6f;
+  /* Spotify green palette */
+  --color-brand-50: #e8faf0;
+  --color-brand-100: #c3f0d4;
+  --color-brand-200: #86e0a9;
+  --color-brand-300: #4dd183;
+  --color-brand-400: #1fbd5e;
+  --color-brand-500: #1DB954;
+  --color-brand-600: #1aa34a;
+  --color-brand-700: #158c3e;
+  --color-brand-800: #107532;
+  --color-brand-900: #0a5e27;
+  --color-brand-950: #063d19;
+
+  /* Spotify dark surfaces */
+  --color-spotify-base: #121212;
+  --color-spotify-elevated: #181818;
+  --color-spotify-highlight: #282828;
+  --color-spotify-subdued: #3e3e3e;
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
 }
 
 /* Enable class-based dark mode for Tailwind v4 */
 @variant dark (&:where(.dark, .dark *));
+
+/* Base font */
+html, body {
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Spotify-style scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #3e3e3e;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #535353;
+}

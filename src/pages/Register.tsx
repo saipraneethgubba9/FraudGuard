@@ -2,6 +2,16 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Shield, Mail, Lock, User, Phone, MapPin } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { supabase } from "../lib/supabase";
+
+const GoogleIcon = () => (
+  <svg className="w-5 h-5" viewBox="0 0 24 24">
+    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+  </svg>
+);
 
 export const Register: React.FC = () => {
   const [name, setName] = useState("");
@@ -10,127 +20,114 @@ export const Register: React.FC = () => {
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
   const [error, setError] = useState("");
+  const [googleLoading, setGoogleLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
     const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email, password, phone, location }),
     });
     const data = await res.json();
-    if (res.ok) {
-      login(data);
-      navigate("/");
-    } else {
-      setError(data.error);
-    }
+    if (res.ok) { login(data); navigate("/"); }
+    else setError(data.error);
   };
 
+  const handleGoogleSignUp = async () => {
+    setGoogleLoading(true);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
+    });
+    if (error) { setError(error.message); setGoogleLoading(false); }
+  };
+
+  const inputCls = "w-full pl-12 pr-4 py-3.5 bg-[#3e3e3e] border border-[#535353] rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all outline-none text-white placeholder:text-[#6a6a6a]";
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-zinc-950 flex items-center justify-center p-6">
-      <div className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-none p-10 border border-gray-100 dark:border-zinc-800">
-        <div className="flex flex-col items-center mb-10">
-          <div className="w-16 h-16 bg-brand-600 rounded-2xl flex items-center justify-center shadow-lg shadow-brand-200 mb-6">
-            <Shield className="text-white w-10 h-10" />
+    <div className="min-h-screen bg-[#121212] flex items-center justify-center p-6">
+      <div className="w-full max-w-md bg-[#181818] rounded-3xl p-10 border border-[#282828]">
+        <div className="flex flex-col items-center mb-8">
+          <div className="w-16 h-16 bg-brand-500 rounded-2xl flex items-center justify-center shadow-lg shadow-brand-500/30 mb-6">
+            <Shield className="text-black w-10 h-10" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Create Account</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-2">Join FraudGuard today</p>
+          <h1 className="text-3xl font-bold text-white">Create Account</h1>
+          <p className="text-[#b3b3b3] mt-2 text-sm">Join FraudGuard today</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <button
+          onClick={handleGoogleSignUp}
+          disabled={googleLoading}
+          className="w-full flex items-center justify-center gap-3 py-3.5 px-4 bg-[#282828] border border-[#3e3e3e] rounded-xl font-semibold text-white hover:bg-[#3e3e3e] transition-all mb-6 disabled:opacity-50 text-sm"
+        >
+          <GoogleIcon />
+          {googleLoading ? "Redirecting..." : "Sign up with Google"}
+        </button>
+
+        <div className="flex items-center gap-4 mb-6">
+          <div className="flex-1 h-px bg-[#282828]" />
+          <span className="text-xs text-[#6a6a6a] font-medium uppercase tracking-widest">or</span>
+          <div className="flex-1 h-px bg-[#282828]" />
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="p-4 bg-brand-50 dark:bg-brand-900/20 text-brand-600 rounded-xl text-sm font-medium border border-brand-100 dark:border-brand-900/30">
+            <div className="p-4 bg-red-500/10 text-red-400 rounded-xl text-sm font-medium border border-red-500/20">
               {error}
             </div>
           )}
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">Full Name</label>
+            <label className="text-xs font-bold text-[#b3b3b3] uppercase tracking-widest ml-1">Full Name</label>
             <div className="relative">
-              <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full pl-12 pr-4 py-3.5 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all outline-none text-gray-900 dark:text-white"
-                placeholder="John Doe"
-                required
-              />
+              <User className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6a6a6a] w-5 h-5" />
+              <input type="text" value={name} onChange={(e) => setName(e.target.value)} className={inputCls} placeholder="John Doe" required />
             </div>
           </div>
-
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">Email Address</label>
+            <label className="text-xs font-bold text-[#b3b3b3] uppercase tracking-widest ml-1">Email Address</label>
             <div className="relative">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-12 pr-4 py-3.5 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all outline-none text-gray-900 dark:text-white"
-                placeholder="name@example.com"
-                required
-              />
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6a6a6a] w-5 h-5" />
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputCls} placeholder="name@example.com" required />
             </div>
           </div>
-
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">Phone</label>
+              <label className="text-xs font-bold text-[#b3b3b3] uppercase tracking-widest ml-1">Phone</label>
               <div className="relative">
-                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3.5 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all outline-none text-gray-900 dark:text-white"
-                  placeholder="9876543210"
-                />
+                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6a6a6a] w-5 h-5" />
+                <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className={inputCls} placeholder="9876543210" />
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">Location</label>
+              <label className="text-xs font-bold text-[#b3b3b3] uppercase tracking-widest ml-1">Location</label>
               <div className="relative">
-                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  type="text"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3.5 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all outline-none text-gray-900 dark:text-white"
-                  placeholder="City, India"
-                />
+                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6a6a6a] w-5 h-5" />
+                <input type="text" value={location} onChange={(e) => setLocation(e.target.value)} className={inputCls} placeholder="City, India" />
               </div>
             </div>
           </div>
-
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">Password</label>
+            <label className="text-xs font-bold text-[#b3b3b3] uppercase tracking-widest ml-1">Password</label>
             <div className="relative">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-12 pr-4 py-3.5 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all outline-none text-gray-900 dark:text-white"
-                placeholder="••••••••"
-                required
-              />
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6a6a6a] w-5 h-5" />
+              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className={inputCls} placeholder="••••••••" required />
             </div>
           </div>
-
           <button
             type="submit"
-            className="w-full py-4 bg-brand-600 text-white rounded-xl font-bold shadow-lg shadow-brand-200 dark:shadow-none hover:bg-brand-700 transition-all active:scale-[0.98]"
+            className="w-full py-4 bg-brand-500 text-black rounded-full font-bold hover:bg-brand-400 transition-all active:scale-[0.98] text-sm tracking-wide"
           >
             Create Account
           </button>
         </form>
 
-        <p className="text-center mt-8 text-gray-500 dark:text-gray-400">
+        <p className="text-center mt-8 text-[#b3b3b3] text-sm">
           Already have an account?{" "}
-          <Link to="/login" className="text-brand-600 font-bold hover:underline">
+          <Link to="/login" className="text-white font-bold hover:text-brand-500 transition-colors">
             Login
           </Link>
         </p>
