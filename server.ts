@@ -64,7 +64,7 @@ async function startServer() {
     }
     const token = jwt.sign({ id: user.id, email: user.email, name: user.name }, JWT_SECRET);
     res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax" });
-    res.json({ id: user.id, name: user.name, email: user.email, language: user.language });
+    res.json({ id: user.id, name: user.name, email: user.email, phone: user.phone, location: user.location, language: user.language });
   });
 
   app.post("/api/auth/logout", (req, res) => {
@@ -97,7 +97,7 @@ async function startServer() {
 
       const token = jwt.sign({ id: user.id, email: user.email, name: user.name }, JWT_SECRET);
       res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax" });
-      res.json({ id: user.id, name: user.name, email: user.email, language: user.language || "en" });
+      res.json({ id: user.id, name: user.name, email: user.email, phone: user.phone, location: user.location, language: user.language || "en" });
     } catch (e: any) {
       res.status(500).json({ error: "Google sign-in failed" });
     }
