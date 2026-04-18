@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getTranslation } from "../i18n";
 import { Globe, LogOut, ShieldCheck, Moon, Sun, User as UserIcon, Phone, MapPin, CheckCircle } from "lucide-react";
@@ -8,6 +9,7 @@ function cn(...inputs: any[]) {
 }
 
 export const Settings: React.FC = () => {
+  const navigate = useNavigate();
   const { user, logout, updateLanguage, updateProfile, theme, toggleTheme } = useAuth();
   const lang = user?.language || "en";
 
@@ -23,7 +25,10 @@ export const Settings: React.FC = () => {
     await updateProfile({ name, phone, location });
     setUpdating(false);
     setSuccess(true);
-    setTimeout(() => setSuccess(false), 3000);
+    setTimeout(() => {
+      setSuccess(false);
+      navigate("/");
+    }, 1500);
   };
 
   const languages = [

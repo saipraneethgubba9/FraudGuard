@@ -31,7 +31,7 @@ export const AuthCallback: React.FC = () => {
       if (res.ok) {
         const userData = await res.json();
         login(userData);
-        navigate("/");
+        navigate("/settings");
       } else {
         navigate("/login");
       }

@@ -33,7 +33,7 @@ export const Register: React.FC = () => {
       body: JSON.stringify({ name, email, password, phone, location }),
     });
     const data = await res.json();
-    if (res.ok) { login(data); navigate("/"); }
+    if (res.ok) { login(data); navigate("/settings"); }
     else setError(data.error);
   };
 
