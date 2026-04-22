@@ -258,31 +258,65 @@ async function startServer() {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) return res.status(503).json({ error: "AI service not configured. Please set GEMINI_API_KEY." });
 
+    const analyzeWithFallback = (msg: string) => {
+      const m = msg.toLowerCase();
+      const highKeywords = ["pay", "registration fee", "otp", "kyc", "lottery", "won", "prize", "click here", "verify your account", "urgent", "limited slots", "free money", "earn from home", "work from home", "salary", "per hour", "investment", "double your money", "bitcoin", "crypto", "wire transfer"];
+      const medKeywords = ["offer", "discount", "deal", "free", "gift", "reward", "selected", "congratulations", "winner"];
+      const highCount = highKeywords.filter(k => m.includes(k)).length;
+      const medCount = medKeywords.filter(k => m.includes(k)).length;
+      let riskScore = Math.min(95, highCount * 25 + medCount * 10);
+      let riskLevel = riskScore >= 60 ? "High" : riskScore >= 30 ? "Medium" : "Low";
+      const matched = [...highKeywords, ...medKeywords].filter(k => m.includes(k));
+      return {
+        riskScore,
+        riskLevel,
+        explanation: riskScore >= 60
+          ? `This message contains multiple scam indicators: ${matched.slice(0,4).join(", ")}. These are classic tactics used in fraud — asking for fees, promising unrealistic earnings, or creating urgency.`
+          : riskScore >= 30
+          ? `This message has some suspicious elements (${matched.join(", ")}). It may not be a scam but proceed with caution.`
+          : "This message does not contain obvious scam indicators. However, always verify the sender's identity before sharing personal information.",
+        recommendation: riskScore >= 60
+          ? "Do NOT pay any money, share OTPs, or click any links. Block and report the sender immediately."
+          : riskScore >= 30
+          ? "Be cautious. Verify the sender through official channels before taking any action."
+          : "Looks relatively safe, but always stay alert and never share sensitive information with unknown sources.",
+      };
+    };
+
     try {
       const ai = new GoogleGenAI({ apiKey });
-      const response = await ai.models.generateContent({
-        model: "gemini-2.0-flash",
-        contents: `Analyze this message for potential scams: "${message}"`,
-        config: {
-          systemInstruction: `You are a cybersecurity expert. Analyze the provided text for scam indicators. Respond in the language: ${lang || "en"}. Return a JSON object with: riskScore (0-100 integer), riskLevel ("Low", "Medium", or "High"), explanation (why it is or isn't a scam), and recommendation (what the user should do).`,
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              riskScore: { type: Type.NUMBER },
-              riskLevel: { type: Type.STRING },
-              explanation: { type: Type.STRING },
-              recommendation: { type: Type.STRING },
+      let lastError: any;
+      for (const model of ["gemini-1.5-flash", "gemini-2.0-flash"]) {
+        try {
+          const response = await ai.models.generateContent({
+            model,
+            contents: `Analyze this message for potential scams: "${message}"`,
+            config: {
+              systemInstruction: `You are a cybersecurity expert. Analyze the provided text for scam indicators. Respond in the language: ${lang || "en"}. Return a JSON object with: riskScore (0-100 integer), riskLevel ("Low", "Medium", or "High"), explanation (why it is or isn't a scam), and recommendation (what the user should do).`,
+              responseMimeType: "application/json",
+              responseSchema: {
+                type: Type.OBJECT,
+                properties: {
+                  riskScore: { type: Type.NUMBER },
+                  riskLevel: { type: Type.STRING },
+                  explanation: { type: Type.STRING },
+                  recommendation: { type: Type.STRING },
+                },
+                required: ["riskScore", "riskLevel", "explanation", "recommendation"],
+              },
             },
-            required: ["riskScore", "riskLevel", "explanation", "recommendation"],
-          },
-        },
-      });
-      const analysis = JSON.parse(response.text || "{}");
-      res.json(analysis);
+          });
+          const analysis = JSON.parse(response.text || "{}");
+          return res.json(analysis);
+        } catch (e: any) {
+          lastError = e;
+          if (!e.message?.includes("429") && !e.message?.includes("quota")) throw e;
+        }
+      }
+      throw lastError;
     } catch (err: any) {
-      console.error("Gemini error:", err);
-      res.status(500).json({ error: "AI analysis failed. Please try again." });
+      console.error("Gemini error:", err.message || err);
+      res.json(analyzeWithFallback(message));
     }
   });
 
